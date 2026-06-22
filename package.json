@@ -1,0 +1,14 @@
+{
+  "name": "society-face-recognition",
+  "version": "1.0.0",
+  "description": "Face recognition registry and log system for a housing society using face-api.js and Node.js JSON database.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "private": true
+}

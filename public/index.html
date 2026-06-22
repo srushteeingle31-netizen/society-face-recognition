@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrance Gate Scanner | Society Guard AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/face-api.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <!-- Custom Shield SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <span class="brand-text">Society Guard</span>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="index.html" class="sidebar-link active">
+          <!-- Custom Video SVG -->
+          <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          Gate Scanner
+        </a>
+        <a href="register.html" class="sidebar-link">
+          <!-- Custom User-Plus SVG -->
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Register Face
+        </a>
+        <a href="admin.html" class="sidebar-link">
+          <!-- Custom Bar Chart SVG -->
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Admin Dashboard
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div>Gate Entrance Terminal</div>
+        <div class="sidebar-status">
+          <div class="status-dot"></div>
+          <span>System Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Society Entrance Gateway</h1>
+          <p class="page-subtitle">AI-assisted security screening. Face authentication scans logged automatically.</p>
+        </div>
+        <div>
+          <button class="btn btn-secondary" onclick="initializeAudioContext()" style="font-size: 0.75rem; padding: 0.5rem 0.85rem;">
+            <!-- Custom Sound SVG -->
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            Activate Sound Alerts
+          </button>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Live Video Scanner Panel -->
+        <div class="card-panel" style="padding: 1.25rem;">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            Live Terminal Camera
+          </div>
+          
+          <div class="webcam-panel" id="camera-box">
+            <!-- Viewfinder corners -->
+            <div class="viewfinder-corner viewfinder-tl"></div>
+            <div class="viewfinder-corner viewfinder-tr"></div>
+            <div class="viewfinder-corner viewfinder-bl"></div>
+            <div class="viewfinder-corner viewfinder-br"></div>
+            
+            <div class="scan-laser" id="laser"></div>
+            
+            <!-- Technical Diagnostic Overlay -->
+            <div class="diagnostic-overlay">
+              <div>FEED: <span style="color:var(--success)">STREAMING</span></div>
+              <div>RESOLUTION: <span id="diag-res">640x480</span></div>
+              <div>PROCESSOR: <span style="color:var(--accent-cyan)">WebcamAPI</span></div>
+              <div>LATENCY: <span id="diag-latency">0ms</span></div>
+              <div>DETECTOR: <span style="color:var(--accent-cyan)">TinyFaceAPI</span></div>
+            </div>
+
+            <video id="webcam" autoplay muted playsinline></video>
+            <canvas id="overlay-canvas"></canvas>
+            
+            <!-- Bottom Scan Bar -->
+            <div class="bottom-instruction-bar">
+              <div class="instruction-pulse" id="pulse-dot"></div>
+              <span id="scan-instruction">Initializing Face Recognition...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Results Sidebar -->
+        <div class="card-panel" style="display:flex; flex-direction:column; gap:1.5rem;">
+          <div>
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Verification Results
+            </div>
+            
+            <!-- Dynamic authentication outcome card -->
+            <div id="status-card" class="verification-card ready">
+              <div class="status-symbol" id="status-icon">
+                <!-- Search Loupe SVG -->
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </div>
+              <h3 class="verification-title" id="status-title">System Standby</h3>
+              <p class="verification-subtitle" id="status-desc">Awaiting face alignment in the security viewport...</p>
+              <div id="status-action-area"></div>
+            </div>
+          </div>
+
+          <!-- Quick logs activity feed -->
+          <div style="flex:1; display:flex; flex-direction:column;">
+            <div class="card-title" style="margin-bottom: 0.75rem;">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Recent Entry Logs
+            </div>
+            
+            <div class="quick-logs-feed" id="quick-logs">
+              <!-- Dynamically populated -->
+              <div class="empty-state">
+                <div class="empty-state-icon">
+                  <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+                </div>
+                <h5>No entry logs recorded</h5>
+                <p>Scanner logs will appear here in real time.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/app.js?v=2"></script>
+  <script src="js/scanner.js?v=2"></script>
+</body>
+</html>

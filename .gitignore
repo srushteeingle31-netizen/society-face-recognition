@@ -1,0 +1,5 @@
+database/db.json
+.system_generated/
+*.log
+__pycache__/
+.DS_Store

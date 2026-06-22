@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Registry | Society Guard AI</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/face-api.js"></script>
+</head>
+<body>
+
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <!-- Custom Shield SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <span class="brand-text">Society Guard</span>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <a href="index.html" class="sidebar-link">
+          <!-- Custom Video SVG -->
+          <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          Gate Scanner
+        </a>
+        <a href="register.html" class="sidebar-link active">
+          <!-- Custom User-Plus SVG -->
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Register Face
+        </a>
+        <a href="admin.html" class="sidebar-link">
+          <!-- Custom Bar Chart SVG -->
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Admin Dashboard
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div>Gate Entrance Terminal</div>
+        <div class="sidebar-status">
+          <div class="status-dot"></div>
+          <span>System Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Member Face Enrollment</h1>
+          <p class="page-subtitle">Register residents, visitors, staff members, or delivery services in the local database.</p>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Live Video Scanner Panel -->
+        <div class="card-panel" style="padding: 1.25rem;">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            Live Terminal Camera
+          </div>
+          
+          <div class="webcam-panel" id="camera-box">
+            <!-- Viewfinder corners -->
+            <div class="viewfinder-corner viewfinder-tl"></div>
+            <div class="viewfinder-corner viewfinder-tr"></div>
+            <div class="viewfinder-corner viewfinder-bl"></div>
+            <div class="viewfinder-corner viewfinder-br"></div>
+            
+            <div class="scan-laser" id="laser"></div>
+            
+            <!-- Technical Diagnostic Overlay -->
+            <div class="diagnostic-overlay">
+              <div>FEED: <span style="color:var(--success)">STREAMING</span></div>
+              <div>RESOLUTION: <span id="diag-res">640x480</span></div>
+              <div>PROCESSOR: <span style="color:var(--accent-cyan)">WebcamAPI</span></div>
+              <div>DETECTOR: <span style="color:var(--accent-cyan)">TinyFaceAPI</span></div>
+            </div>
+
+            <video id="webcam" autoplay muted playsinline></video>
+            <canvas id="overlay-canvas"></canvas>
+            
+            <!-- Bottom Scan Bar -->
+            <div class="bottom-instruction-bar">
+              <div class="instruction-pulse" id="pulse-dot"></div>
+              <span id="scan-instruction">Initializing Camera...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Form Panel -->
+        <div class="card-panel">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Enrollment Form
+          </div>
+          
+          <form id="register-form" onsubmit="handleRegistration(event)">
+            <!-- Hidden role input which gets synchronized with clicking grid cards -->
+            <input type="hidden" id="reg-role" value="Visitor">
+
+            <!-- Custom Category Grid Card Selector -->
+            <div class="form-group">
+              <span class="input-label">Select Category / Role</span>
+              <div class="category-grid">
+                <div class="category-option" id="role-Resident" onclick="selectRole('Resident')">
+                  <!-- Custom Home SVG -->
+                  <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  <span class="category-label">Resident</span>
+                </div>
+                
+                <div class="category-option active" id="role-Visitor" onclick="selectRole('Visitor')">
+                  <!-- Custom User SVG -->
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span class="category-label">Visitor</span>
+                </div>
+
+                <div class="category-option" id="role-Staff" onclick="selectRole('Staff')">
+                  <!-- Custom Briefcase SVG -->
+                  <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  <span class="category-label">Staff</span>
+                </div>
+
+                <div class="category-option" id="role-Delivery" onclick="selectRole('Delivery')">
+                  <!-- Custom Truck SVG -->
+                  <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                  <span class="category-label">Delivery</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="input-label" for="reg-name">Full Name</label>
+              <input type="text" id="reg-name" class="input-field" required placeholder="e.g. Jane Smith">
+            </div>
+
+            <div class="form-group">
+              <label class="input-label" for="reg-contact">Contact Number</label>
+              <input type="tel" id="reg-contact" class="input-field" required placeholder="e.g. 9876543210">
+            </div>
+
+            <div class="form-group">
+              <label class="input-label" for="reg-flat" id="flat-label">Flat / Room No.</label>
+              <input type="text" id="reg-flat" class="input-field" placeholder="e.g. A-301">
+            </div>
+
+            <div class="form-group" id="reason-group">
+              <label class="input-label" for="reg-reason" id="reason-label">Reason for Visiting</label>
+              <input type="text" id="reg-reason" class="input-field" placeholder="e.g. Meeting friend, delivery drop-off">
+            </div>
+
+            <div class="btn-group">
+              <button type="submit" class="btn" id="btn-submit" disabled style="flex: 1;">
+                <!-- Custom User Plus SVG -->
+                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                Register Member
+              </button>
+              <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                Reset
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/app.js?v=2"></script>
+  <script src="js/register.js?v=2"></script>
+</body>
+</html>
